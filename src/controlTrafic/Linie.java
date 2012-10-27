@@ -12,11 +12,32 @@ public class Linie {
 
     private Tren t;
     private boolean ocupata;
+    private int id;
 
     Linie() {
+        this.id = 0;//default 0
         this.ocupata = false;
+        this.t = null;
+    }
+    //pentru cazul in care deja punem si id-ul. aceasta probabil va fi cea mai folosita
+    Linie(int id){
+        this.id = id;
+        this.ocupata = false;
+        this.t = null;
+    }
+    //pentru cazul in care in momentul adaugarii liniei deja vrem sa punem tren pe linie
+    Linie(int id, Tren t){
+        this.id = id;
+        this.ocupata = true;
+        this.t = t;
     }
     
+    Linie(Tren t, boolean ocupata, int id) {
+        this.t = t;
+        this.ocupata = ocupata;
+        this.id = id;
+    }
+
     /*
      *  adauga tren se foloseste la adaugarea unui tren pe linie
      *  
@@ -34,7 +55,16 @@ public class Linie {
             return false;
         }
     }
-    
+    /**
+     *
+     * @return
+     */
+    @Override
+    public String toString(){
+        String este=this.ocupata?" se afla trenul "+this.t.getId():" nu se afla niciun tren";
+        return "Pe linia "+this.id+este;
+    }
+
     /*
      *  stergeTren se foloseste la stergerea trenului de pe linie
      *  
@@ -50,12 +80,26 @@ public class Linie {
             return false;
         }
     }
-
-    public boolean iaStatus() {
+    /*
+     * Returneaza starea liniei
+     */
+    public boolean getStatus() {
         return this.ocupata;
     }
-
-    public Tren iaTren() {
+    /*
+     * returneaza trenul care se afla pe linie
+     */
+    public Tren getTren() {
         return this.t;
+    }
+    /*
+     * returneaza id-ul liniei
+     */
+    public int getId() {
+        return this.id;
+    }
+    
+    public void setId(int id){
+        this.id = id;
     }
 }

@@ -33,10 +33,11 @@ public class ControlerGara extends Thread{
     }
     
     ControlerGara(int gid) {
+        Globals globals = new Globals();
         this.gara = new Gara(gid);
         //facem clientul pentru serverul de date
         try {
-            this.socket = new Socket(InetAddress.getByName("localhost"),1999);//adresa si portul serverului este constanta
+            this.socket = new Socket(InetAddress.getByName(globals.ipServer),globals.portServer);//adresa si portul serverului este constanta
             CereDetaliiGara(gid);
         } catch (Exception ex) {
             ex.printStackTrace();

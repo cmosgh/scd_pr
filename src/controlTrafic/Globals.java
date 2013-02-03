@@ -8,6 +8,7 @@ package controlTrafic;
  *
  * @author cmos
  */
-public class ConstanteGlobale {
-    
+public class Globals {
+    public static String ipServer = "localhost";
+    public static int portServer = 1999;
 }

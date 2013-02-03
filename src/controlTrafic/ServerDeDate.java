@@ -4,10 +4,7 @@
  */
 package controlTrafic;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -17,9 +14,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,9 +72,6 @@ public class ServerDeDate extends Thread {
         try {
             System.out.println("Inchid conexiunea la DB");
             con.close();
-
-
-
         } catch (SQLException ex) {
             Logger.getLogger(ServerDeDate.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -98,7 +90,7 @@ public class ServerDeDate extends Thread {
         //pregatim cererea
         try {
             Statement s = con.createStatement();
-            String query ="select * from APP.ORAR where ORAPORNIRE="+timp; 
+            String query ="select * from ORAR JOIN TRENURI ON ORAR.TRID=TRENURI.TRID where ORAPORNIRE="+timp; 
             ResultSet rs = s.executeQuery(query);
             int i = 0;
             while (rs.next()) {
@@ -106,10 +98,16 @@ public class ServerDeDate extends Thread {
                 int gidp = rs.getInt("GIDPORNIRE");
                 int gido = rs.getInt("GIDOPRIRE");
                 int trid = rs.getInt("TRID");
+                int gidtren = rs.getInt("GID");
                 System.out.println("Am citit GIDPORNIRE:" + gidp+
                         " GIDOPRIRE:"+gido+
-                        " TRID:"+trid);
-                ClientGara cg = new ClientGara(gidp, this);
+                        " TRID:"+trid+" GARATREN:"+gidtren);
+                Properties param = new Properties();
+                param.put("gidp",gidp+"");
+                param.put("gido",gido+"");
+                param.put("trid",trid+"");
+                Cerere cerere = new Cerere(2,param); // id 2 corespunde cu pune trenul pe o linie
+                ClientGara cg = new ClientGara(cerere, this);
                 cg.start();
             }
             rs.close();
@@ -144,10 +142,12 @@ class ClientGara extends Thread{
     private String adresaGara;
     private String numeGara;
     private int portGara;
+    private Cerere cerere;
     private ServerDeDate sd;
     
-    public ClientGara(int gid, ServerDeDate sd) {
-        this.gid = gid;
+    public ClientGara(Cerere cere, ServerDeDate sd) {
+        this.gid = Integer.parseInt(cere.getParametrii().getProperty("gidp"));
+        this.cerere = cere;
         this.sd=sd;//avem nevoie de serverul de date ca sa nu mai deschidem o noua conexiune la baza de date :)
         Connection con = sd.getCon();
         try {
@@ -178,6 +178,10 @@ class ClientGara extends Thread{
          try {
             System.out.println("Server Ne conectam la gara "+gid);
             Socket sclient = new Socket(InetAddress.getByName(adresaGara),portGara);
+            ObjectOutputStream oos = new ObjectOutputStream(sclient.getOutputStream());
+            oos.writeObject(this.cerere);
+            oos.flush();
+            
             System.out.println("Connection OK!");
             sclient.close();
             return;

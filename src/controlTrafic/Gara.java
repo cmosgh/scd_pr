@@ -130,6 +130,12 @@ public class Gara {
     public void setLiniiIesire(List<Linie> liniiIesire) {
         this.liniiIesire = liniiIesire;
     }
+    
+    public void puneTrenPeLinie (int idLinie, Tren tren){
+        Linie l = new Linie(idLinie, tren);
+        //actualizam linia respectiva
+        this.liniiPeron.set(idLinie, l);
+    }
 
     /**
      *

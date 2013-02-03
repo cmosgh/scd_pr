@@ -34,7 +34,19 @@ public class ClientHandlerGara extends Thread{
     
     public Properties primescTren(Cerere c){
         Properties raspuns = new Properties();
-        
+        Properties stLinii = statusLinii();//citim statusul actual
+        boolean liber = stLinii.getProperty("exista","false").equals("true")?true:false;
+        if (liber){
+            int trid = Integer.parseInt(c.getParametrii().getProperty("trid"));
+            int idLinieLibera = Integer.parseInt(stLinii.getProperty("idLinieLibera"));
+            Tren t = new Tren(trid);
+            cg.puneTrenPeLinie(t , idLinieLibera);
+            raspuns.put("success","true");
+            raspuns.put("idLinie",idLinieLibera+"");
+        } else {
+            raspuns.put("success","false");
+            raspuns.put("idLinie", "-1");
+        }
         return raspuns;
     }
     

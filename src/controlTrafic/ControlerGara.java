@@ -56,6 +56,15 @@ public class ControlerGara extends Thread{
         id = gara.getLinieLibera("peron").getId();
         return id;
     }
+
+    public void puneTrenPeLinie(Tren t, int idLinieLibera) {
+       gara.puneTrenPeLinie(idLinieLibera, t);
+    }
+
+    @Override
+    public void interrupt() {
+        super.interrupt();
+    }
     
     private void CereDetaliiGara(int gid){
         ObjectOutputStream oos = null;
@@ -97,7 +106,6 @@ class ServerGara extends Thread{
             while (true) {
                 System.out.println("Gara "+cg.getGara().getNume()+" asteapta cereri...");
                 Socket s = ss.accept();
-
                 SocketAddress addr = s.getRemoteSocketAddress();
                 System.out.println(addr);
                 ClientHandlerGara handler = new ClientHandlerGara(s, cg);

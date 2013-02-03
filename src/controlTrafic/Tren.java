@@ -9,11 +9,11 @@ import java.io.Serializable;
 /**
  *
  * aceasta clasa are o structura simpla
- * deocamdata nu retinem numai Id-ul trenului
+ * deocamdata nu retinem numai Id-ul trenului si tipul trenului
  * 
  */
 public class Tren implements Serializable{
-    
+    private String tip; 
     private int id;
     
     Tren(int id ){
@@ -30,6 +30,14 @@ public class Tren implements Serializable{
     
     public int getId(){
         return id;
+    }
+
+    public String getTip() {
+        return tip;
+    }
+
+    public void setTip(String tip) {
+        this.tip = tip;
     }
     
 }

@@ -14,14 +14,16 @@ import java.util.Date;
  * @author cmos
  */
 public class Orar implements Serializable{
-    private Gara pornire, sosire;
-    private Date tpornire, tsosire;
+    private int gidOrigine, gidDestinatie;
+    private int  idTren;
+    private int tpornire, tsosire;
     
-    Orar (Gara pornire, Gara sosire, Date tpornire, Date tsosire) {
-        this.pornire = pornire;
-        this.sosire = sosire;
+    Orar (int gidOrigine, int gidDestinatie, int tpornire, int tsosire, int idTren) {
+        this.gidOrigine = gidOrigine;
+        this.gidDestinatie = gidDestinatie;
         this.tpornire = tpornire;
         this.tsosire = tsosire;
+        this.idTren = idTren;
     }
     /**
      *
@@ -29,8 +31,7 @@ public class Orar implements Serializable{
      */
     @Override
     public String toString(){
-        DateFormat df = new SimpleDateFormat("dd/MM/yyy HH:mm:ss");
-        return "Pornim din gara "+pornire.getNume()+"la ora "+df.format(tpornire)+ " si sosim in "+sosire.getNume()+ " la ora "+df.format(tsosire);
+        //@TODO sa preia legatura intre baza de date si informatia
+        return "Pornim din gara "+gidOrigine+"la ora "+tpornire+ " si sosim in "+gidDestinatie+ " la ora "+tsosire;
     }
-    
 }

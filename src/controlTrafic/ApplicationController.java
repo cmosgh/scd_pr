@@ -11,6 +11,9 @@ package controlTrafic;
 public class ApplicationController {
     public static void main(String[] args){
         //aceasta este clasa de baza care va controla lansarea clientilor
-        
+        ControlerGara cg1 = new ControlerGara(1);
+        cg1.run();
+        ControlerGara cg2 = new ControlerGara(2);
+        cg2.run();
     }
 }

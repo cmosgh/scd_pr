@@ -15,6 +15,9 @@ import java.io.Serializable;
 public class Tren implements Serializable{
     private String tip; 
     private int id;
+    private String nume;
+    private int gid;
+    
     
     Tren(int id ){
         this.id = id;
@@ -38,6 +41,27 @@ public class Tren implements Serializable{
 
     public void setTip(String tip) {
         this.tip = tip;
+    }
+
+    public String getNume() {
+        return nume;
+    }
+
+    public void setNume(String nume) {
+        this.nume = nume;
+    }
+
+    public int getGid() {
+        return gid;
+    }
+
+    public void setGid(int gid) {
+        this.gid = gid;
+    }
+    
+    @Override
+    public String toString(){
+        return "Trenul id:"+id+" de tip:"+tip;
     }
     
 }

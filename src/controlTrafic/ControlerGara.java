@@ -4,6 +4,7 @@
  */
 package controlTrafic;
 
+import java.awt.Component;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,6 +15,7 @@ import java.net.SocketAddress;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.*;
 
 
 /**
@@ -23,6 +25,7 @@ import java.util.logging.Logger;
 public class ControlerGara extends Thread{
     private Gara gara;
     private Socket socket;
+    private GaraUI interfataGrafica;
 
     public Gara getGara() {
         return gara;
@@ -32,13 +35,34 @@ public class ControlerGara extends Thread{
         return socket;
     }
     
+    public GaraUI getInterfataGrafica(){
+        return interfataGrafica;
+    }
+    
     ControlerGara(int gid) {
         Globals globals = new Globals();
         this.gara = new Gara(gid);
+        this.interfataGrafica = new GaraUI(this);
+        
+        
+        //pornim interfata in lazy mode
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                interfataGrafica.setVisible(true);
+                try {
+                    sleep(500);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ControlerGara.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                interfataGrafica.schimbaNumeGara(gara.getNume());
+
+            }
+        });
+        
         //facem clientul pentru serverul de date
         try {
             this.socket = new Socket(InetAddress.getByName(globals.ipServer),globals.portServer);//adresa si portul serverului este constanta
-            CereDetaliiGara(gid);
+            cereDetaliiGara(gid);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -59,6 +83,35 @@ public class ControlerGara extends Thread{
 
     public void puneTrenPeLinie(Tren t, int idLinieLibera) {
        gara.puneTrenPeLinie(idLinieLibera, t);
+       interfataGrafica.puneTrenPeLinie(idLinieLibera, t);
+       interfataGrafica.scrieLog("Punem un tren pe linia"+idLinieLibera);
+    }
+    
+    public void iaTrenDePeLinie (int idLinie){
+        Tren t = gara.iaTrenDePeLinie(idLinie);
+        //trebuie sa salvam situatia in baza de date de pe server
+        Properties param = new Properties();
+        interfataGrafica.iaTrenDePeLinie(idLinie);
+        interfataGrafica.scrieLog("Trenul"+t.getId()+" a fost pus in depou.");
+        param.put("trid", t.getId()+"");
+        param.put("gid", gara.getId()+"");
+        Cerere cerere = new Cerere(2,param);// 2 este id-ul pentru punere tren la o anumita gara
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject(cerere);
+            oos.flush();
+            
+            //citim datele primite de la server
+            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+            Properties pr = (Properties)ois.readObject();
+            
+            String success = pr.getProperty("success");
+            if (success.equals("true")) interfataGrafica.scrieLog("Serverul confirma punerea in depou.");
+            else interfataGrafica.scrieLog("Serverul infirma punerea in depou.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -66,9 +119,10 @@ public class ControlerGara extends Thread{
         super.interrupt();
     }
     
-    private void CereDetaliiGara(int gid){
+    private void cereDetaliiGara(int gid){
         ObjectOutputStream oos = null;
         try {
+            
             Properties param = new Properties();
             param.put("id",gid+"");
             Cerere cs = new Cerere(1,param);

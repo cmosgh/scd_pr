@@ -136,6 +136,12 @@ public class Gara {
         //actualizam linia respectiva
         this.liniiPeron.set(idLinie, l);
     }
+    
+    public Tren iaTrenDePeLinie(int idLinie){
+        Tren t = this.liniiPeron.get(idLinie).getTren();
+        this.liniiPeron.get(idLinie).stergeTren();
+        return t;
+    }
 
     /**
      *

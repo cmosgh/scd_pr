@@ -13,8 +13,11 @@ import java.net.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author evo
@@ -58,6 +61,45 @@ public class ClientHandlerServer extends Thread{
         return param;
     }
     
+    private Properties puneTrenInDepou(Cerere c){
+        Properties raspuns= new Properties();
+        boolean success = false;
+        try {
+            //avem conexiunea la baza de date
+            Connection con = sd.getCon();
+            Statement s = con.createStatement();
+            String query = "update TRENURI set GID = "+c.getParametrii().getProperty("gid")+" where TRID="+c.getParametrii().getProperty("trid");
+            success = s.execute(query);
+           
+        } catch (SQLException ex) {
+            Logger.getLogger(ClientHandlerServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        raspuns.put("success", success?"true":"false");
+        return raspuns;
+    }
+    
+    private Properties adaugaOrar(Cerere c){
+        Properties raspuns= new Properties();
+        boolean success = false;
+        try {
+            //avem conexiunea la baza de date
+            Connection con = sd.getCon();
+            Statement s = con.createStatement();
+            String query = "insert into ORAR (GIDPORNIRE, GIDOPRIRE, ORAPORNIRE, TRID) VALUES ("
+                    + c.getParametrii().getProperty("gidpornire")+", "
+                    + c.getParametrii().getProperty("gidoprire")+", "
+                    + c.getParametrii().getProperty("orapornire")+", "
+                    + c.getParametrii().getProperty("trid")
+                    + ")";
+            success = s.execute(query);
+           
+        } catch (SQLException ex) {
+            Logger.getLogger(ClientHandlerServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        raspuns.put("success", success?"true":"false");
+        return raspuns;
+    }
+    
     
     
     public void run(){
@@ -76,9 +118,18 @@ public class ClientHandlerServer extends Thread{
                         Properties infoGara = this.CerereInformatiiGara(cs);
                         oos.writeObject(infoGara);
                         break;
+                    case 2: //pune un tren in depou
+                        Properties rezultatPuneTren = this.puneTrenInDepou(cs);
+                        oos.writeObject(rezultatPuneTren);
+                        break;
+                    case 3:
+                        Properties rezultatAdaugaOrar = this.adaugaOrar(cs);
+                        oos.writeObject(rezultatAdaugaOrar);
+                        break;
                     default:
                         Properties p = new Properties();
                         p.put("mesaj","Comanda necunoscuta");
+                        p.put("success","false");
                         oos.writeObject(p);
                         break;
                 }

@@ -15,5 +15,8 @@ public class ApplicationController {
         cg1.run();
         ControlerGara cg2 = new ControlerGara(2);
         cg2.run();
+        ControlerGara cg3 = new ControlerGara(3);
+        cg3.run();
+        
     }
 }
